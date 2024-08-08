@@ -45,7 +45,6 @@ if __name__ == "__main__":
     res = []
     br = BrowserManager(config, myLogger)
     csvManager = CSVManager(config["refFile"], config, myLogger)
-    current = ""
     web = config["webs"]["pecomark"]
     login = br.login("pecomark")
     eater = SoupEater()
