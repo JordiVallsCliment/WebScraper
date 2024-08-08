@@ -1,0 +1,30 @@
+{
+  "savefile": "./preus/preus.csv",
+  "refFile": "./referencies/referencies.xlsx",
+  "prods" : [
+    {
+      "web": "pecomark",
+      "prod_id": "406260"
+    }
+  ],
+  "webs": {
+    "pecomark": {
+      "login": "https://www.pecomark.com/es/login",
+      "prod_url": "https://www.pecomark.com/es/c/p/",
+      "form": "loginForm",
+      "userField": "j_username",
+      "passField": "j_password",
+      "usr": "compras@vallscliment.com",
+      "pass": "~4!k9\"or!g:",
+      "struct": {
+        "name": "div",
+        "class": "col-xs-12 productInfoSection",
+        "struct":
+          {
+            "name": ["p", "div"],
+            "class": ["price", "name"]
+          }
+      }
+    }
+  }
+}
