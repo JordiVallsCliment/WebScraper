@@ -1,5 +1,7 @@
 {
-  "savefile": "./preus/preus.csv",
+  "PECOMARK SA": "pecomark",
+  "OHAUS EUROPE GmbH": "ohaus",
+  "savefile": "./preus/preus$web.xlsx",
   "refFile": "./referencies/referencies.xlsx",
   "prods" : [
     {
@@ -17,13 +19,30 @@
       "usr": "compras@vallscliment.com",
       "pass": "~4!k9\"or!g:",
       "struct": {
+        "name": "p",
+        "class": "price"
+      }
+    },
+    "ohaus": {
+      "login": "https://eu.partnershop.ohaus.com/login",
+      "prod_url": "https://eu.partnershop.ohaus.com/Productos/p/",
+      "form": "loginForm",
+      "userField": "username",
+      "passField": "password",
+      "usr": "info@vallscliment.com",
+      "pass": "Nopucposar-la",
+      "struct":
+      {
         "name": "div",
-        "class": "col-xs-12 productInfoSection",
-        "struct":
-          {
-            "name": ["p", "div"],
-            "class": ["price", "name"]
+        "class": "container",
+        "struct": {
+          "name": "div",
+          "class":  "productDetailsPage",
+          "struct": {
+            "name": "div",
+            "class":  "col-md-6 col-sm-6 col-xs-12 priceBox margin-top-10"
           }
+        }
       }
     }
   }

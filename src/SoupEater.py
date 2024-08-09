@@ -14,6 +14,27 @@ except OSError as e:
 else:
     myLogger = logging.getLogger(__name__)
 
+
+def munch(assist):
+    name = assist["name"]
+    clas = assist["class"]
+    try:
+        if assist["sameLevel"] == "True":
+            sameLevel = True
+    except:
+        sameLevel = False
+    try:
+        struct = assist["struct"]
+    except:
+        struct = None
+    return name, clas, sameLevel, struct
+
+
+def digest(name, clas, page):
+    res = page.find(name, {"class": clas})
+    return res
+
+
 class SoupEater():
     def __init__(self):
         self.myLogger = myLogger
@@ -29,36 +50,30 @@ class SoupEater():
         self.soup = BeautifulSoup(data, 'html.parser')
 
     def eat(self):
-        nums = re.compile(r"[+-]?\d+(.|,)?\d+")
-        self.myLogger.info("Iniciant cerca de variables")
-        assist = self.web["struct"]
+        nums = re.compile(r"€?\d+(.|,)?\d+€?")
+        self.myLogger.debug("Iniciant cerca de variables")
+        struct = self.web["struct"]
         res = self.soup
         try:
             while True:
-                try:
-                    next = assist["struct"]
-                except:
-                    next = ""
-                if next == "":
-                    i = 0
-                    for name in assist["name"]:
-                        tmp = res.find(name, {"class": assist["class"][i]})
-                        if assist["class"][i] == "name":
-                            name = str(tmp.contents[0])
-                            continue
-                        preu = str(tmp.contents[0])
-                        try:
-                            alt = str(tmp.contents[1])
-                        except:
-                            alt = "0"
-                        i += 1
+                name, clas, sameLevel, struct = munch(struct)
+                if not sameLevel:
+                    res = digest(name, clas, res)
+                else:
+                    temp = digest(name, clas, res)
+                if struct is None:
+                    preu = str(res.contents[0])
+                    try:
+                        alt = str(res.contents[1])
+                    except:
+                        alt = ".0"
                     break
-                assist = assist["struct"]
         except:
             self.myLogger.error("Error en la definició de la variable", exc_info=True)
             raise
         else:
             preu = float(nums.search(preu).group(0).replace(",", "."))
             preu2 = float(nums.search(alt).group(0).replace(",", "."))
-            self.myLogger.info("Producte " + name + " trobat. Preus: " + str(preu) + " i " + str(preu2))
-            return name, preu, preu2
+            self.myLogger.debug("Producte " + str(self.product) + " trobat. Preus: " + str(preu) + " i " + str(preu2))
+            return preu, preu2
+

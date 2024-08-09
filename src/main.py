@@ -41,26 +41,51 @@ else:
     myLogger = logging.getLogger(__name__)
 
 
-if __name__ == "__main__":
-    res = []
-    br = BrowserManager(config, myLogger)
-    csvManager = CSVManager(config["refFile"], config, myLogger)
-    web = config["webs"]["pecomark"]
-    login = br.login("pecomark")
+def scraper(selection=None):
+    mode = config[selection]
+    br = BrowserManager(config)
+    csvManager = CSVManager(config["refFile"], config, mode)
+    web = config["webs"][mode]
+    br.login(mode)
     eater = SoupEater()
     i = 0
-    products = csvManager.get_refs()
-    for prod in products:
-        i += 1
-        myLogger.info("Producte " + str(i) + "/" + str(len(products)))
-        try:
-            page = br.get(web["prod_url"] + str(prod))
-            eater.prepare(prod, config["webs"]["pecomark"])
-            eater.boil(page)
-            name, preu, preu2 = eater.eat()
-            csvManager.append_row(str(prod), name, preu, preu2)
-        except:
-            myLogger.error("Producte no trobat", exc_info=True)
-    br.logout()
+
+    for store in csvManager.df["seller_ids"].unique():
+        if selection is not None:
+            if selection != store:
+                continue
+        products = csvManager.get_refs(store)
+        for prod in products:
+            i += 1
+            myLogger.debug("Producte " + str(i) + "/" + str(len(products)))
+            try:
+                page = br.get(web["prod_url"] + str(prod))
+                eater.prepare(prod, config["webs"][mode])
+                eater.boil(page)
+                preu, preu2 = eater.eat()
+                save = csvManager.check_defaults(preu, preu2, str(prod))
+                if save:
+                    csvManager.append_row(str(prod), preu, preu2)
+            except Exception as e:
+                myLogger.debug("Producte no trobat", exc_info=True)
+        br.logout()
     csvManager.saveCSV()
 
+
+if __name__ == "__main__":
+    while True:
+        print("Actualització dels preus del catàleg de productes de Valls Climent\n"
+              "1. Actualització de Pecomark.\n2. Actualització de Ohaus.\n"
+              "9. Actualització universal\n"
+              "10. Sortir")
+        cmd = input("Comanda: ")
+        if cmd == "1":
+            scraper("PECOMARK SA")
+        if cmd == "2":
+            print("No implementat. Executant amb pecomark\n")
+            scraper("PECOMARK SA")
+        if cmd == "9":
+            print("No implementat. Executant amb pecomark")
+            scraper("PECOMARK SA")
+        if cmd == "10":
+            break
